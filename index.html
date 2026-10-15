@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Private Album</title>
+  <meta name="theme-color" content="#121212" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar">
+      <h1 class="logo">📷 My Private Album</h1>
+      <nav>
+        <button data-section="all" class="active">Toutes les photos</button>
+        <button data-section="albums">Albums</button>
+        <button data-section="favorites">Favoris</button>
+        <button data-section="recent">Ajouts récents</button>
+        <button data-section="trash">Corbeille</button>
+        <button data-section="settings">Paramètres</button>
+      </nav>
+
+      <div class="album-section">
+        <div class="album-header">
+          <span>Mes albums</span>
+          <button id="new-album-btn" title="Nouvel album">+</button>
+        </div>
+        <ul id="album-list"></ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <span id="user-email"></span>
+        <button id="logout-btn">Déconnexion</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="toolbar">
+        <input id="search-input" type="search" placeholder="Rechercher une photo…" />
+        <select id="sort-select">
+          <option value="created_at:desc">Plus récentes</option>
+          <option value="created_at:asc">Plus anciennes</option>
+          <option value="original_name:asc">Nom (A-Z)</option>
+          <option value="original_name:desc">Nom (Z-A)</option>
+        </select>
+        <button id="add-photos-btn" class="primary-btn">+ Ajouter des photos</button>
+        <button id="bulk-delete-btn" hidden>Supprimer la sélection</button>
+        <button id="empty-trash-btn" hidden>Vider la corbeille</button>
+        <input id="file-input" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden />
+      </header>
+
+      <div id="upload-progress" class="upload-progress" hidden></div>
+
+      <section id="photo-grid" class="photo-grid">
+        <p class="empty-state">Chargement…</p>
+      </section>
+    </main>
+  </div>
+
+  <div id="lightbox" class="lightbox" hidden>
+    <button class="lightbox-close">✕</button>
+    <img src="" alt="" />
+    <p class="lightbox-caption"></p>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connexion — My Private Album</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-card">
+    <h1>My Private Album</h1>
+    <p class="auth-subtitle">Accès réservé — aucune inscription publique.</p>
+
+    <form id="login-form" novalidate>
+      <label for="email">Adresse e-mail</label>
+      <input id="email" type="email" autocomplete="username" required />
+
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" autocomplete="current-password" required />
+
+      <button type="submit" id="login-submit">Se connecter</button>
+      <p id="login-error" class="auth-error" hidden></p>
+    </form>
+
+    <button id="forgot-btn" class="link-btn">Mot de passe oublié ?</button>
+  </main>
+
+  <script type="module">
+    import { login, requestPasswordReset, getSession } from "./js/auth.js";
+
+    // Si une session valide existe déjà, inutile de rester sur la connexion.
+    getSession().then((session) => {
+      if (session) location.replace("index.html");
+    });
+
+    const form = document.getElementById("login-form");
+    const errorEl = document.getElementById("login-error");
+    const submitBtn = document.getElementById("login-submit");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl.hidden = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Connexion…";
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      const result = await login(email, password);
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Se connecter";
+
+      if (!result.ok) {
+        errorEl.textContent = result.message;
+        errorEl.hidden = false;
+        return;
+      }
+      location.replace("index.html");
+    });
+
+    document.getElementById("forgot-btn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      if (!email) {
+        errorEl.textContent = "Renseigne ton adresse e-mail pour recevoir le lien de réinitialisation.";
+        errorEl.hidden = false;
+        return;
+      }
+      await requestPasswordReset(email);
+      errorEl.textContent = "Si ce compte existe, un e-mail de réinitialisation a été envoyé.";
+      errorEl.hidden = false;
+    });
+  </script>
+</body>
+</html>
