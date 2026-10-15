@@ -277,6 +277,10 @@ nav button:hover, nav button.active {
 
 .empty-state.error { color: var(--danger); }
 
+.lightbox[hidden] {
+  display: none;
+}
+
 .lightbox {
   position: fixed;
   inset: 0;
