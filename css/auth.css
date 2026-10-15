@@ -1,0 +1,466 @@
+/* css/auth.css — scène de lampe interactive pour la page de connexion.
+   Isolé de css/style.css : ne redéfinit que des classes propres à login.html,
+   ne touche à rien de l'album (index.html). */
+
+.auth-body {
+  --room-black: #0b0706;
+  --room-chocolate: #1c120c;
+  --amber: #e8a95a;
+  --amber-deep: #c97b2e;
+  --rose: #8a4a4f;
+  --cream: #f3ece2;
+  --cream-dim: #a99484;
+  --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --font-body: "Inter", -apple-system, "Segoe UI", sans-serif;
+
+  margin: 0;
+  min-height: 100vh;
+  background: var(--room-black);
+  font-family: var(--font-body);
+  color: var(--cream);
+  overflow-x: hidden;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- */
+/* Scène                                                              */
+/* ---------------------------------------------------------------- */
+
+.scene {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding: clamp(2rem, 6vw, 5rem);
+  isolation: isolate;
+}
+
+.lamp-switch-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Fond de la pièce : noir profond avec un très léger dégradé chocolat,
+   qui se réchauffe doucement une fois la lampe allumée. */
+.scene-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 18% 45%, rgba(232, 169, 90, 0) 0%, rgba(232, 169, 90, 0) 100%),
+    linear-gradient(160deg, var(--room-chocolate) 0%, var(--room-black) 65%);
+  transition: background 1.6s ease;
+}
+
+.lamp-switch-input:checked ~ .scene-backdrop {
+  background:
+    radial-gradient(ellipse 65% 55% at 20% 42%, rgba(232, 169, 90, 0.16) 0%, rgba(232, 169, 90, 0) 70%),
+    linear-gradient(160deg, var(--room-chocolate) 0%, var(--room-black) 65%);
+}
+
+/* Cadre discret évoquant une photo encadrée au mur, à peine visible dans le noir. */
+.scene-frame {
+  position: absolute;
+  z-index: 0;
+  top: 14%;
+  right: 12%;
+  width: 92px;
+  height: 120px;
+  border: 1px solid rgba(243, 236, 226, 0.08);
+  background: rgba(243, 236, 226, 0.02);
+  opacity: 0.5;
+  transition: opacity 1.6s ease, border-color 1.6s ease;
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .scene-frame {
+    display: block;
+  }
+}
+
+.lamp-switch-input:checked ~ .scene-frame {
+  opacity: 0.9;
+  border-color: rgba(232, 169, 90, 0.18);
+}
+
+/* ---------------------------------------------------------------- */
+/* Colonne lampe                                                     */
+/* ---------------------------------------------------------------- */
+
+.lamp-column {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  flex: 0 0 auto;
+}
+
+.lamp {
+  position: relative;
+  display: block;
+  width: 150px;
+  height: 230px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lamp:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 6px;
+  border-radius: 8px;
+}
+
+/* halo ambiant derrière l'ampoule */
+.lamp-glow {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  width: 260px;
+  height: 260px;
+  transform: translate(-50%, -38%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 169, 90, 0.55) 0%, rgba(232, 169, 90, 0) 70%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+.lamp-switch-input:checked ~ .lamp-column .lamp-glow {
+  opacity: 1;
+}
+
+/* faisceau conique projeté vers le bas */
+.lamp-beam {
+  position: absolute;
+  top: 92px;
+  left: 50%;
+  width: 240px;
+  height: 320px;
+  transform: translateX(-50%) scaleY(0.85);
+  transform-origin: top center;
+  clip-path: polygon(44% 0%, 56% 0%, 100% 100%, 0% 100%);
+  background: linear-gradient(to bottom, rgba(232, 169, 90, 0.28), rgba(232, 169, 90, 0));
+  opacity: 0;
+  transition: opacity 1.3s ease 0.1s, transform 1.3s ease 0.1s;
+  pointer-events: none;
+}
+
+.lamp-switch-input:checked ~ .lamp-column .lamp-beam {
+  opacity: 1;
+  transform: translateX(-50%) scaleY(1);
+}
+
+.lamp-shade {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 96px;
+  height: 64px;
+  transform: translateX(-50%);
+  clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+  background: linear-gradient(180deg, #2a1c14 0%, #1a110c 100%);
+  box-shadow: inset 0 -6px 10px rgba(0, 0, 0, 0.4);
+}
+
+.lamp-bulb {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #4a3b2e;
+  box-shadow: 0 0 0 rgba(232, 169, 90, 0);
+  transition: background 0.8s ease, box-shadow 0.8s ease;
+}
+
+.lamp-switch-input:checked ~ .lamp-column .lamp-bulb {
+  background: #fde8c4;
+  box-shadow: 0 0 18px 6px rgba(232, 169, 90, 0.85), 0 0 46px 18px rgba(232, 169, 90, 0.45);
+}
+
+.lamp-neck {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  width: 4px;
+  height: 118px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, #4a3123, #2a1c14);
+}
+
+.lamp-base {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 78px;
+  height: 10px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #3a2719, #1a110c);
+}
+
+.lamp-cord {
+  position: absolute;
+  top: 66px;
+  left: calc(50% + 34px);
+  width: 1px;
+  height: 46px;
+  background: rgba(243, 236, 226, 0.25);
+}
+
+.lamp-pull-knob {
+  position: absolute;
+  top: 110px;
+  left: calc(50% + 34px);
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--amber-deep);
+  box-shadow: 0 0 0 rgba(232, 169, 90, 0);
+  transition: box-shadow 0.8s ease, background 0.8s ease;
+}
+
+.lamp-switch-input:checked ~ .lamp-column .lamp-pull-knob {
+  background: var(--amber);
+  box-shadow: 0 0 8px 2px rgba(232, 169, 90, 0.7);
+}
+
+.lamp-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  color: var(--cream-dim);
+  text-align: center;
+  max-width: 180px;
+  transition: opacity 0.8s ease;
+}
+
+.lamp-switch-input:checked ~ .lamp-column .lamp-hint {
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Colonne formulaire                                                 */
+/* ---------------------------------------------------------------- */
+
+.form-column {
+  position: relative;
+  z-index: 2;
+  flex: 0 1 380px;
+}
+
+.form-panel {
+  padding: clamp(1.75rem, 3vw, 2.5rem);
+  background: rgba(20, 13, 10, 0.6);
+  border: 1px solid rgba(232, 169, 90, 0.14);
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  opacity: 0.22;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 1s ease 0.35s, transform 1s ease 0.35s, border-color 1s ease 0.35s;
+}
+
+.lamp-switch-input:checked ~ .form-column .form-panel {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  border-color: rgba(232, 169, 90, 0.3);
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--rose);
+}
+
+.form-panel h1 {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-style: italic;
+  font-size: clamp(1.7rem, 3vw, 2.1rem);
+  line-height: 1.2;
+  color: var(--cream);
+}
+
+.subtitle {
+  margin: 0 0 1.6rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--cream-dim);
+  max-width: 34ch;
+}
+
+#login-form label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--cream-dim);
+  margin: 1rem 0 0.4rem;
+}
+
+#login-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.8rem;
+  background: rgba(11, 7, 6, 0.6);
+  border: 1px solid rgba(243, 236, 226, 0.14);
+  border-radius: 3px;
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+#login-form input:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 2.6rem;
+}
+
+.password-field button {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--cream-dim);
+  cursor: pointer;
+  padding: 0.2rem;
+  line-height: 0;
+}
+
+.password-field button:hover,
+.password-field button:focus-visible {
+  color: var(--amber);
+}
+
+#login-submit {
+  width: 100%;
+  margin-top: 1.6rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, var(--amber) 0%, var(--amber-deep) 100%);
+  color: #211207;
+  border: none;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+#login-submit:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+#login-submit:disabled {
+  opacity: 0.65;
+  cursor: default;
+  transform: none;
+}
+
+.auth-error {
+  margin-top: 0.9rem;
+  color: #e3a8a0;
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.link-btn {
+  margin-top: 1.2rem;
+  background: none;
+  border: none;
+  color: var(--cream-dim);
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.link-btn:hover,
+.link-btn:focus-visible {
+  color: var(--amber);
+}
+
+/* ---------------------------------------------------------------- */
+/* Mobile                                                             */
+/* ---------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .scene {
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 2rem 1.25rem 3rem;
+  }
+
+  .lamp {
+    width: 110px;
+    height: 170px;
+    transform: scale(0.85);
+  }
+
+  .lamp-column {
+    gap: 0.6rem;
+  }
+
+  .lamp-hint {
+    font-size: 0.76rem;
+  }
+
+  .form-column {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .form-panel {
+    padding: 1.5rem;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Préférence de réduction des animations                            */
+/* ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-backdrop,
+  .scene-frame,
+  .lamp-glow,
+  .lamp-beam,
+  .lamp-bulb,
+  .lamp-pull-knob,
+  .lamp-hint,
+  .form-panel,
+  #login-submit {
+    transition-duration: 0.01ms !important;
+  }
+}
